@@ -1,6 +1,6 @@
 import logging
 from requests import RequestException
-from exceptions import ParseFindTagException
+from exceptions import ParserFindTagException
 
 
 def get_response(session, url):
@@ -20,5 +20,5 @@ def find_tag(soup, tag, attrs=None):
     if searched_tag is None:
         error_msg = f'Не найден тег {tag} {attrs}'
         logging.error(error_msg, stack_info=True)
-        raise ParseFindTagException(error_msg)
+        raise ParserFindTagException(error_msg)
     return searched_tag
