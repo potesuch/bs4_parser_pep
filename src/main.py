@@ -1,10 +1,8 @@
 import re
 import requests_cache
 import logging
-from requests import RequestException
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-from prettytable import PrettyTable
 from tqdm import tqdm
 from constants import BASE_DIR, MAIN_DOC_URL, PEP_URL, EXPECTED_STATUS
 from configs import configure_argument_parser, configure_logging
@@ -13,11 +11,20 @@ from utils import get_response, find_tag
 
 
 def whats_new(session):
+    """
+    Собирает данные о нововведениях в Python из раздела "What's New".
+
+    Args:
+        session (requests_cache.CachedSession): Сессия с кешированием запросов.
+
+    Returns:
+        list: Список с данными о нововведениях.
+    """
     whats_new_url = urljoin(MAIN_DOC_URL, 'whatsnew/')
     response = get_response(session, whats_new_url)
     soup = BeautifulSoup(response.text, 'lxml')
     main_div = find_tag(soup, 'section', {'id': 'what-s-new-in-python'})
-    div_with_ul = find_tag(main_div, 'div', 
+    div_with_ul = find_tag(main_div, 'div',
                            {'class': 'toctree-wrapper compound'})
     sections_by_python = div_with_ul.find_all('li', class_='toctree-l1')
     results = []
@@ -35,6 +42,15 @@ def whats_new(session):
 
 
 def latest_versions(session):
+    """
+    Собирает данные о последних версиях документации Python.
+
+    Args:
+        session (requests_cache.CachedSession): Сессия с кешированием запросов.
+
+    Returns:
+        list: Список с данными о версиях и их статусах.
+    """
     response = get_response(session, MAIN_DOC_URL)
     soup = BeautifulSoup(response.text, 'lxml')
     sidebar = find_tag(soup, 'div', {'class': 'sphinxsidebarwrapper'})
@@ -58,13 +74,21 @@ def latest_versions(session):
 
 
 def download(session):
+    """
+    Скачивает архив документации Python в формате PDF.
+
+    Args:
+        session (requests_cache.CachedSession): Сессия с кешированием запросов.
+    """
     download_url = urljoin(MAIN_DOC_URL, 'download.html')
     downloads_dir = BASE_DIR / 'downloads'
     downloads_dir.mkdir(exist_ok=True)
     response = get_response(session, download_url)
     soup = BeautifulSoup(response.text, 'lxml')
     table_tag = find_tag(soup, 'table', {'class': 'docutils'})
-    pdf_a4_tag = find_tag(table_tag, 'a', {'href': re.compile(r'.+pdf-a4\.zip$')})
+    pdf_a4_tag = find_tag(
+        table_tag, 'a', {'href': re.compile(r'.+pdf-a4\.zip$')}
+    )
     pdf_a4_link = pdf_a4_tag['href']
     archive_url = urljoin(download_url, pdf_a4_link)
     filename = archive_url.split('/')[-1]
@@ -76,10 +100,23 @@ def download(session):
 
 
 def pep(session):
+    """
+    Собирает данные о PEP (Python Enhancement Proposals).
+
+    Args:
+        session (requests_cache.CachedSession): Сессия с кешированием запросов.
+
+    Returns:
+        list: Список с данными о статусах PEP и их количестве.
+    """
     response = get_response(session, PEP_URL)
     soup = BeautifulSoup(response.text, 'lxml')
     section_tag = find_tag(soup, 'section', {'id': 'numerical-index'})
-    table_tag = find_tag(section_tag, 'table', {'class': 'pep-zero-table docutils align-default'})
+    table_tag = find_tag(
+        section_tag,
+        'table',
+        {'class': 'pep-zero-table docutils align-default'}
+    )
     tbody_tag = find_tag(table_tag, 'tbody')
     tr_tags = tbody_tag.find_all('tr')
     peps = []
@@ -137,6 +174,12 @@ MODE_TO_FUNCTION = {
 
 
 def main():
+    """
+    Основная функция для запуска парсера.
+
+    Конфигурирует логирование, парсер аргументов командной строки,
+    создает сессию с кешированием запросов и выполняет выбранный режим работы.
+    """
     configure_logging()
     logging.info('Парсер запущен!')
     arg_parser = configure_argument_parser(MODE_TO_FUNCTION.keys())

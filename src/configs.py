@@ -1,11 +1,19 @@
 import argparse
 import logging
 from logging.handlers import RotatingFileHandler
-from datetime import datetime
 from constants import BASE_DIR, DATETIME_FORMAT, LOG_FORMAT
 
 
 def configure_argument_parser(available_methods):
+    """
+    Конфигурирует парсер аргументов командной строки.
+
+    Args:
+        available_methods (list): Список доступных режимов работы парсера.
+
+    Returns:
+        argparse.ArgumentParser: Настроенный парсер аргументов.
+    """
     parser = argparse.ArgumentParser(description='Парсер документации Python')
     parser.add_argument(
         'mode',
@@ -28,6 +36,11 @@ def configure_argument_parser(available_methods):
 
 
 def configure_logging():
+    """
+    Настраивает логирование с использованием ротации файлов.
+
+    Логи будут сохраняться в директорию 'logs'.
+    """
     log_dir = BASE_DIR / 'logs'
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / 'parse.log'
