@@ -11,14 +11,14 @@
 
 1. Убедитесь, что у вас установлен Python 3.7 или новее.
 2. Установите виртуальное окружение (опционально, но рекомендуется):
-    ```sh
-    python -m venv venv
-    source venv/bin/activate  # Для Windows используйте venv\Scripts\activate
-    ```
+``` sh
+python -m venv venv
+source venv/bin/activate  # Для Windows используйте venv\Scripts\activate
+```
 3. Установите зависимости:
-    ```sh
-    pip install -r requirements.txt
-    ```
+``` sh
+pip install -r requirements.txt
+```
 
 ## Использование
 
@@ -30,7 +30,7 @@
 
 Примеры запуска:
 
-```sh
+``` sh
 python main.py whats-new -o pretty
 python main.py latest-versions -o file
 python main.py download -c
